@@ -1,7 +1,13 @@
 var express = require('express');
-var twilio = require('twilio');
+var Twilio = require('twilio');
 
 // Account SID and auth token are stored in environment variables.
+
+var accountSid = process.env.TWILIO_ACCOUNT_SID;
+var authToken = process.env.TWILIO_AUTH_TOKEN;
+
+var twilio = new Twilio(accountSid, authToken);
+
 var app = express();
 
 app.use('/static', express.static('www'));
@@ -13,16 +19,17 @@ app.post('/voice', function(req, res) {
   var songUrl = 'https://' + req.headers.host + '/static/hello-it.mp3';
 
   // Generate a TwiML response
-  var twiml = new twilio.TwimlResponse();
-
+  var VoiceResponse = Twilio.twiml.VoiceResponse;
+  var voiceResponse = new VoiceResponse();
+  
   // Set the response type as XML.
   res.header('Content-Type', 'text/xml');
 
-  // Play Guile's theme over the phone.
-  twiml.play(songUrl);
+  // Play mp3 over the phone.
+  voiceResponse.play(songUrl);
 
   // Send the TwiML as the response.
-  res.send(twiml.toString());
+  res.send(voiceResponse.toString());
 });
 
 // Make our Express server listen on port 3000.
